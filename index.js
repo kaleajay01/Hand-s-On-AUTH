@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Show HTML
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "home.html"));
+  res.sendFile(path.join(__dirname, "public", "register.html"));
 });
 
 // API routes

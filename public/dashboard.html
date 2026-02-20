@@ -1,11 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- jQuery (optional, for convenience) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
-<body>
-    
+
+<body class="bg-light">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Auth App</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item d-flex align-items-center me-3">
+            <span class="text-white">Welcome, <strong id="displayName">User</strong></span>
+          </li>
+          <li class="nav-item">
+            <button id="logoutBtn" class="btn btn-outline-light btn-sm">Logout</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <div class="container my-4">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Profile</h5>
+            <p class="card-text mb-1">
+              <strong>Name:</strong> <span id="profileName">User</span>
+            </p>
+            <p class="card-text mb-1">
+              <strong>User ID:</strong> <span id="profileId">N/A</span>
+            </p>
+            <p class="card-text mb-2 mt-2">
+              <strong>JWT token</strong> <small class="text-muted">(saved in localStorage)</small>
+            </p>
+            <p class="card-text small text-break bg-light p-2 rounded" id="tokenDisplay">—</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Dashboard</h5>
+            <p class="text-muted">
+              This is a sample protected page. After successful login, you can show user-specific data here
+              (orders, profile info, activities, etc.).
+            </p>
+
+            <table class="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Action</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Account created</td>
+                  <td>Just now</td>
+                  <td><span class="badge bg-success">Completed</span></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Sample activity</td>
+                  <td>-</td>
+                  <td><span class="badge bg-secondary">Pending</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script: require JWT, load user from /api/me or localStorage -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const token = localStorage.getItem("token");
+
+      function redirectToLogin() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("userId");
+        window.location.href = "/login.html";
+      }
+
+      if (!token) {
+        redirectToLogin();
+        return;
+      }
+
+      function setUser(name, userId) {
+        document.getElementById("displayName").textContent = name || "User";
+        document.getElementById("profileName").textContent = name || "User";
+        document.getElementById("profileId").textContent = userId != null ? userId : "N/A";
+        var t = localStorage.getItem("token");
+        document.getElementById("tokenDisplay").textContent = t || "—";
+      }
+
+      // Optional: fetch current user from server (validates token)
+      fetch("/api/me", {
+        headers: { "Authorization": "Bearer " + token }
+      })
+        .then(function (res) {
+          if (res.status === 401) {
+            redirectToLogin();
+            return;
+          }
+          return res.json();
+        })
+        .then(function (data) {
+          if (data) {
+            setUser(data.name, data.userId);
+          } else {
+            setUser(localStorage.getItem("userName"), localStorage.getItem("userId"));
+          }
+        })
+        .catch(function () {
+          setUser(localStorage.getItem("userName"), localStorage.getItem("userId"));
+        });
+
+      document.getElementById("logoutBtn").addEventListener("click", function () {
+        redirectToLogin();
+      });
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
