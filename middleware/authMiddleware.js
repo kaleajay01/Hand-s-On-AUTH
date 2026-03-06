@@ -1,12 +1,5 @@
 const jwt = require("jsonwebtoken");
-
-// Use environment variable in production: process.env.JWT_SECRET
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
-
-/**
- * Verify JWT from Authorization: Bearer <token> and attach decoded user to req.user.
- * Responds with 401 if missing or invalid token.
- */
 function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
 
@@ -18,7 +11,7 @@ function verifyToken(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded; // { userId, name, iat, exp }
+    req.user = decoded;
     next();
   } catch (err) {
     return res.status(401).json({ message: "Invalid or expired token." });
