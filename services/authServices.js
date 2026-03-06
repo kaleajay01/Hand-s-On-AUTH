@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 
 
 exports.addUser = (name, password, callback) => {
-  // Hash password before saving
   bcrypt
     .hash(password, 10)
     .then((hashedPassword) => {
